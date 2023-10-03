@@ -1,141 +1,179 @@
-let context
-let rectangle
-let loop;
-context = document.querySelector("canvas").getContext("2d");
-let   movementDirections = {
-  up: false,
-  left: false,
-  right: false,
-};
-context.canvas.height = 400;
-context.canvas.width = 800;
+const context = document.querySelector('canvas');
+const c = context.getContext("2d");
+context.width = innerWidth;
+context.height = innerHeight;
 
-const platform = {
-  x: 60,          // X position of the platform
-  y: context.canvas.height / 1.5,  // Y position (halfway up the canvas)
-  width: 100,      // Width of the platform
-  height: 10,      // Height of the platform
-};
+let levelWidth = 10000;
 
-rectangle = {
-  height:32,
-  jumping:true,
-  width:32,
-  x:10,
-  x_velocity:0,
-  y:0,
-  y_velocity:0
-};
+const platformAmount = 100 
+let platforms = [];
 
-window.addEventListener('keydown', e => {
-  let key_state = (e.type == "keydown");
-  
-  switch(e.key) {
-    case 'ArrowLeft':
-      movementDirections.left = key_state;
-      break;
-    case 'ArrowUp':
-      if (key_state && !rectangle.jumping) {
-        rectangle.y_velocity = -50;
-        rectangle.jumping = true;
-      }
-      break;
-    case 'ArrowRight':
-      movementDirections.right = key_state;
-      break;
-  }
-  
+// Physics Variables
+let friction = 0.8;
+let gravity = 1.3;
+let keys = {
+    right: {
+        pressed: false
+    },
+    left: {
+        pressed: false
+    }
+}
+// player constructor
+class Player {
+    constructor() {
+        this.position = {
+            x: 100,
+            y: 300
+        }
+        this.inLevelXPosition = {
+            x: 100
+        }
+        this.velocity = {
+            x: 0,
+            y: 0
+        }
+        this.width = 32
+        this.height = 32
+        this.jumping = false;
+    }
+    create() {
+        c.fillStyle = 'firebrick'
+        c.fillRect(this.position.x, this.position.y, this.width, this.height);
+    }
+    update() {
+        this.create()
+        this.position.y += this.velocity.y;
+        this.velocity.y += gravity;
+
+    }
+}
+
+// platform constructor
+class Platform {
+    constructor() {
+        this.height = 10
+        this.width = Math.floor(Math.random() * (500 - 100) + 100)
+        this.position = {
+            x: Math.floor(Math.random() * levelWidth-this.width),
+            y: Math.floor((Math.random() * innerHeight)),
+        }
+    }
+    create() {
+        c.fillStyle = 'white'
+        c.fillRect(this.position.x, this.position.y, this.width, this.height)
+    }
+    update() {
+        this.create()
+        if ((player.position.x <= 100 && player.inLevelXPosition.x >= 100) || (player.inLevelXPosition.x < levelWidth && player.position.x >= innerWidth/2)) {
+            this.position.x -= player.velocity.x
+        }
+    }
+}   
+
+// keyboard inputs
+addEventListener('keydown', ({ keyCode }) => {
+    switch (keyCode) {
+        case 65:
+            keys.left.pressed = true
+            break;
+        case 68:
+            keys.right.pressed = true    
+                break;
+        case 32:
+            if (!player.jumping) {
+                player.velocity.y = -25;
+                player.jumping = true
+            }
+            break;
+    }
+});
+addEventListener('keyup', ({ keyCode }) => {
+    switch (keyCode) {
+        case 65:
+            keys.left.pressed = false
+            break;
+        case 32:
+            if (!player.jumping) {
+            }
+            break;
+        case 68:
+            keys.right.pressed = false            
+            break;
+    }
 });
 
-window.addEventListener('keyup', e => {
-  movementDirections = {
-    up: false,
-    left: false,
-    right: false,
-  };
-})
+const loop = function() {
+    c.clearRect(0, 0, context.width, context.height);
+    player.update();    
+    console.log(player.inLevelXPosition.x)
+    platforms.forEach(platform => {
+        platform.update()
+        if (
+            player.position.y + player.height >= platform.position.y &&
+            player.position.y <= platform.position.y + platform.height &&
+            player.inLevelXPosition.x + player.width >= platform.position.x &&
+            player.inLevelXPosition.x <= platform.position.x + platform.width
+        ) {
+            player.jumping = false;
+            player.position.y = platform.position.y - player.height;
+            player.velocity.y = 0;
+        }
+    });
 
+    // syncs both position values at an appropriate time, usefull for running back and forth in a level
+    if  ((player.position.x < innerWidth/2) && (player.position.x > innerWidth/4) &&
+        (player.inLevelXPosition.x <innerWidth/2) && (player.inLevelXPosition.x > innerWidth/4)) {
+            player.position.x = player.inLevelXPosition.x
+        }
 
-loop = function() {
-  if (movementDirections.left) {
-    rectangle.x_velocity -= 0.5;
-  }
-  if (movementDirections.right) {
-    rectangle.x_velocity += 0.5;
-  }
-
-  // Check if the rectangle is jumping
-  if (movementDirections.up && !isJumping) {
-    rectangle.jumping = true;
-    rectangle.y_velocity = -50;
-  }
-
-  rectangle.y_velocity += 1.8; // gravity
-  rectangle.x += rectangle.x_velocity;
-  rectangle.y += rectangle.y_velocity;
-  rectangle.x_velocity *= 0.9; // friction
-  rectangle.y_velocity *= 0.9; // friction
-
-  // Check if the rectangle is on the platform
-  if (
-    rectangle.y + rectangle.height >= platform.y &&
-    rectangle.y <= platform.y + platform.height &&
-    rectangle.x + rectangle.width >= platform.x &&
-    rectangle.x <= platform.x + platform.width
-  ) {
-    rectangle.jumping = false;
-    rectangle.y = platform.y - rectangle.height;
-  }
-    // If the rectangle was on the platform and has now passed through it, mark it
-    if (rectangle.y + rectangle.height < platform.y && rectangle.y_velocity > 0) {
-      passedThroughPlatform = true;
+    // keyboard movement actions
+    if (keys.left.pressed) {
+        player.velocity.x = -5
+    } else if (keys.right.pressed) {
+        player.velocity.x = 5    
+    } else {
+        player.velocity.x = player.velocity.x * friction
     }
-    if (!passedThroughPlatform) {
-      rectangle.jumping = false;
-      rectangle.y = platform.y - rectangle.height;
-  }
 
-  // Reset the isJumping flag when the rectangle touches the ground
-  if (rectangle.y > context.canvas.height - rectangle.height) {
-    isJumping = false;
-    rectangle.y = context.canvas.height - rectangle.height;
-    rectangle.y_velocity = 0;
-  }
+    //  moves the player an appropriate amount
+    player.position.x += player.velocity.x;
+
+    // keeps player on the map
+    if (player.inLevelXPosition.x > levelWidth) {
+        player.inLevelXPosition.x = levelWidth
+    }
+    if (player.inLevelXPosition.x < 0) {
+        player.inLevelXPosition.x = playerStartingXPosition;
+    }
+    if (player.inLevelXPosition.x < levelWidth) {
+        player.inLevelXPosition.x += player.velocity.x;
+    }
+    if (player.position.x < 100) {
+        player.position.x = 100
+    } else if (player.position.x > innerWidth/2) {
+        player.position.x = innerWidth/2 
+    }
+
+    // makes double jumping not work
+    if (player.position.y >= context.height - player.height || player.position.y < -50) {
+        player.jumping = false;
+        player.position.y = context.height - player.height;
+        player.velocity.y = 0;
+    }
     
-  if (rectangle.y > 380 - 16 - 32) {
-    rectangle.jumping = false;
-    rectangle.y = 380 - 16 - 32;
-  }
+    // looper
+    window.requestAnimationFrame(loop); 
+}
 
-  if (rectangle.x < -32) {
-    rectangle.x = 832;
-  } else if (rectangle.x > 832) {
-    rectangle.x = -32;
-  }
-
-
-  context.fillStyle = "darkgrey";
-  context.fillRect(0, 0, 800, 400);
-
-  context.fillStyle = "blue";
-  context.fillRect(platform.x, platform.y, platform.width, platform.height);
-
-  context.fillStyle = "firebrick";
-  context.beginPath();
-  context.rect(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
-  context.fill();
-
-  context.strokeStyle = "black";
-  context.lineWidth = 4;
-  context.beginPath();
-  context.moveTo(0, 364);
-  context.lineTo(800, 364);
-  context.stroke();
-  
-
-  window.requestAnimationFrame(loop);
-};
-
-window.requestAnimationFrame(loop);
+for (i=0;i<platformAmount;i++){
+    let newPlatform = new Platform
+    platforms.push(newPlatform)
+}
+const player = new Player
+let playerStartingXPosition = player.position.x
+console.log('player started at:', playerStartingXPosition)
+player.create()
+window.requestAnimationFrame(loop)
 
 
