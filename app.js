@@ -1,12 +1,16 @@
+import level01Platforms from './level-01.js';
+let gameOver = false;
+
 const context = document.querySelector('canvas');
 const c = context.getContext("2d");
 context.width = innerWidth;
 context.height = innerHeight;
 
 let levelWidth = 10000;
+let playerLives = 3;
 
-const platformAmount = 100 
-let platforms = [];
+// const platformAmount = 100 
+
 
 // Physics Variables
 let friction = 0;
@@ -51,7 +55,6 @@ class Player {
         this.position.x = Math.round(this.position.x);
         this.position.y += this.velocity.y;
         this.velocity.y += gravity;
-
     }
 }
 
@@ -140,12 +143,41 @@ const loop = function() {
             player.velocity.y = 0
         }
     });
-console.log(player.position.x)
-console.log(player.inLevelXPosition.x)
     if  ((player.position.x < innerWidth/2) && (player.position.x > playerStartingXPosition) &&
         (player.inLevelXPosition.x <innerWidth/2) && (player.inLevelXPosition.x > innerWidth/4)) {
             player.position.x = player.inLevelXPosition.x
         }
+console.log('context',context.height)
+console.log('player bottom',player.position.y + player.height)
+    if (player.position.y +player.height >= context.height) {
+        if (playerLives > 0) {
+            // Player loses a life
+            playerLives--;
+            // Reset player position
+            player.position.x = playerStartingXPosition;
+            player.position.y = innerHeight/6;
+            player.velocity.y = 0;
+            player.velocity.x = 0;
+            player.inLevelXPosition.x = playerStartingXPosition;
+            platforms = generateInitialPlatforms();
+
+        } else if (!gameOver) {
+            // Player has no lives left, trigger game over
+            alert('You lose!');
+            gameOver = true
+            // Reset the game when the alert is dismissed
+            resetGame();
+        }
+    }
+
+    // player lives markers
+    for (let i = 0; i < playerLives; i++) {
+        const x = 20 + i * 40;
+        const y = 20;
+        c.fillStyle = 'firebrick';
+        c.fillRect(x, y, 32, 32);
+    }
+    
 
     // keyboard movement actions
     if (keys.left.pressed) {
@@ -180,16 +212,39 @@ console.log(player.inLevelXPosition.x)
         player.jumping = false;
         player.position.y = context.height - player.height;
         player.velocity.y = 0;
+        player.inLevelXPosition.x = playerStartingXPosition;
     }
     
     // looper
     window.requestAnimationFrame(loop); 
 }
 
-for (i=0;i<platformAmount;i++){
-    let newPlatform = new Platform
-    platforms.push(newPlatform)
+function resetGame() {
+    // Reload the page to fully reset the game
+    window.location.reload();
 }
+
+function generateInitialPlatforms() {
+    let initialPlatformData = level01Platforms.map((platformData) => {
+        let platform = new Platform();
+        platform.position.x = platformData.x;
+        platform.position.y = platformData.y;
+        platform.width = platformData.width;
+        return platform;
+    });
+    return initialPlatformData;
+}
+
+let platforms = generateInitialPlatforms();
+
+// for (i=0;i<platformAmount;i++){
+//     let newPlatform = new Platform
+//     platforms.push(newPlatform)
+// }
+
+
+
+
 const player = new Player
 let playerStartingXPosition = player.position.x
 console.log('player started at:', playerStartingXPosition)
