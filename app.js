@@ -52,7 +52,7 @@ class Player {
 // platform constructor
 class Platform {
     constructor() {
-        this.height = 10
+        this.height = 15
         this.width = Math.floor(Math.random() * (500 - 100) + 100)
         this.position = {
             x: Math.floor(Math.random() * levelWidth-this.width),
@@ -65,8 +65,11 @@ class Platform {
     }
     update() {
         this.create()
-        if ((player.position.x <= 100 && player.inLevelXPosition.x >= 100) || (player.inLevelXPosition.x < levelWidth && player.position.x >= innerWidth/2)) {
-            this.position.x -= player.velocity.x
+        if (
+            (player.position.x <= 100 && player.inLevelXPosition.x >= 100) ||
+            (player.inLevelXPosition.x < levelWidth && player.position.x >= innerWidth / 2)
+        ) {
+            this.position.x -= player.velocity.x;
         }
     }
 }   
@@ -156,7 +159,7 @@ const loop = function() {
     }
 
     // makes double jumping not work
-    if (player.position.y >= context.height - player.height || player.position.y < -50) {
+    if (player.position.y >= context.height - player.height) {
         player.jumping = false;
         player.position.y = context.height - player.height;
         player.velocity.y = 0;
@@ -175,5 +178,3 @@ let playerStartingXPosition = player.position.x
 console.log('player started at:', playerStartingXPosition)
 player.create()
 window.requestAnimationFrame(loop)
-
-
