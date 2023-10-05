@@ -8,8 +8,9 @@ const startButton = document.getElementById('startButton');
 startButton.addEventListener('click', startGame);
 context.width = innerWidth;
 context.height = innerHeight;
-
-let playerLives = 3;
+let isMenuDisplayed = true
+let PlayerStartingLives = 3
+let playerLives = PlayerStartingLives;
 const scorePositionX = context.width / 2;
 const scorePositionY = 50;
 let scoreTotal = 0;
@@ -20,8 +21,8 @@ let playerStartingXPosition;
 let platforms;
 let player;
 // Sounds
-const soundPlayerLanding = new Audio('/sounds/332661__reitanna__big-thud.wav');
-
+const soundPlayerJumping = new Audio('sounds/399095__plasterbrain__8bit-jump.wav');
+const soundGameOver = new Audio('sounds/362204__taranp__horn_fail_wahwah_3.wav')
 
 
 // Physics Variables
@@ -114,6 +115,7 @@ addEventListener('keydown', ({ keyCode }) => {
                 if (!player.jumping) {
                     player.velocity.y = -20;
                     player.jumping = true
+                    soundPlayerJumping.play();
                 }
                 break;
         }
@@ -147,6 +149,9 @@ const loop = function() {
     isPlayerOnTheGround();
     movePlayer();
     keepPlayerOnTheScreen();
+    if (isMenuDisplayed) {
+        return;
+    }
     requestAnimationFrame(loop); 
 }
 
@@ -171,20 +176,25 @@ function addPoints(platform) {
 }
 function showMenu() {
     menu.style.display = 'flex';
+    isMenuDisplayed = true
 }
 function hideMenu() {
     menu.style.display = 'none';
+    isMenuDisplayed = false
 }
 function gameOver() {
+    soundGameOver.play()
     showMenu();
-    resetGame()
 }
-function resetGame() {
-    window.location.reload()
+function resetScores() {
+    scoreThisLife = 0
+    scoreTotal = 0
 }
 function startGame() {
     createGameAssets()
     hideMenu()
+    resetScores()
+    playerLives = PlayerStartingLives
     window.requestAnimationFrame(loop)
 }
 function drawScore() {
@@ -209,11 +219,7 @@ function isPlayerOnAPlatform() {
             player.position.y <= platform.position.y + platform.height &&
             player.position.x + player.width >= platform.position.x &&
             player.position.x <= platform.position.x + platform.width
-        ) {if (
-            !soundPlayerLanding.paused) {
-            soundPlayerLanding.currentTime = 0; // Reset the sound to the beginning
-        }
-            soundPlayerLanding.play();
+        ) {
             player.jumping = false;
             player.position.y = platform.position.y - player.height;
             player.velocity.y = 0
@@ -263,7 +269,6 @@ function movePlayer () {
     } else {
         player.velocity.x = player.velocity.x * friction
     }
-    //  moves the player an appropriate amount
     player.position.x += player.velocity.x;
 }
 function createGameAssets() {
