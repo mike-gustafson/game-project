@@ -1,19 +1,31 @@
 import level01Platforms from './level-01.js';
-let gameOver = false;
 
+const scoredPlatforms = new Set();
 const context = document.querySelector('canvas');
 const c = context.getContext("2d");
+const menu = document.getElementById('menu');
+const startButton = document.getElementById('startButton');
+startButton.addEventListener('click', startGame);
 context.width = innerWidth;
 context.height = innerHeight;
 
-let levelWidth = 10000;
 let playerLives = 3;
+const scorePositionX = context.width / 2;
+const scorePositionY = 50;
+let scoreTotal = 0;
+let scoreThisLife = 0;
+let levelWidth = 10000;
 
-// const platformAmount = 100 
+let playerStartingXPosition;
+let platforms;
+let player;
+// Sounds
+const soundPlayerLanding = new Audio('/sounds/332661__reitanna__big-thud.wav');
+
 
 
 // Physics Variables
-let friction = 0;
+let friction = .7;
 let gravity = 1.3;
 let keys = {
     right: {
@@ -23,6 +35,7 @@ let keys = {
         pressed: false
     }
 }
+
 // player constructor
 class Player {
     constructor() {
@@ -45,13 +58,8 @@ class Player {
         c.fillStyle = 'firebrick'
         c.fillRect(this.position.x, this.position.y, this.width, this.height);
     }
-    drawLabel() {
-        c.fillStyle = 'black';
-        c.font = '12px Arial';
-        c.fillText(`X: ${this.position.x} ${this.inLevelXPosition.x}`, this.position.x, this.position.y - 5);
-    }
     update() {
-        this.create()
+        this.create();
         this.position.x = Math.round(this.position.x);
         this.position.y += this.velocity.y;
         this.velocity.y += gravity;
@@ -79,6 +87,7 @@ class Platform {
     }
     update() {
         this.create()
+        this.drawLabel()
         this.position.x = Math.round(this.position.x);
 
         if (
@@ -91,24 +100,24 @@ class Platform {
         }
     }
 }   
+// INPUT EVENT LISTENERS--------------------------------------------------------------
 
-// keyboard inputs
 addEventListener('keydown', ({ keyCode }) => {
-    switch (keyCode) {
-        case 65:
-            keys.left.pressed = true
-            break;
-        case 68:
-            keys.right.pressed = true    
+        switch (keyCode) {
+            case 65:
+                keys.left.pressed = true
                 break;
-        case 32:
-            if (!player.jumping) {
-                player.velocity.y = -20;
-                player.jumping = true
-            }
-            break;
-    }
-});
+            case 68:
+                keys.right.pressed = true    
+                    break;
+            case 32:
+                if (!player.jumping) {
+                    player.velocity.y = -20;
+                    player.jumping = true
+                }
+                break;
+        }
+    });
 addEventListener('keyup', ({ keyCode }) => {
     switch (keyCode) {
         case 65:
@@ -124,74 +133,113 @@ addEventListener('keyup', ({ keyCode }) => {
     }
 });
 
+// GAME LOOP -------------------------------------------------------------------------
+
 const loop = function() {
     c.clearRect(0, 0, context.width, context.height);
-    player.update();    
-    player.drawLabel()
-    console.log(player.inLevelXPosition.x-player.position.x)
+    player.update();
+    drawScore()
     platforms.forEach(platform => {
         platform.update()
-        platform.drawLabel()
+    })
+    drawPlayerLives();
+    isPlayerOnAPlatform();
+    isPlayerOnTheGround();
+    movePlayer();
+    keepPlayerOnTheScreen();
+    requestAnimationFrame(loop); 
+}
+
+// FUNCTIONS --------------------------------------------------------------------------
+
+function generatePlatforms() {
+    let initialPlatformData = level01Platforms.map((platformData) => {
+        let platform = new Platform();
+        platform.position.x = platformData.x;
+        platform.position.y = platformData.y;
+        platform.width = platformData.width;
+        return platform;
+    });
+    return initialPlatformData;
+}
+function addPoints(platform) {
+    if (!scoredPlatforms.has(platform)){
+        scoreTotal +=  10;
+        scoreThisLife += 10;
+        scoredPlatforms.add(platform);
+    }
+}
+function showMenu() {
+    menu.style.display = 'flex';
+}
+function hideMenu() {
+    menu.style.display = 'none';
+}
+function gameOver() {
+    showMenu();
+    resetGame()
+}
+function resetGame() {
+    window.location.reload()
+}
+function startGame() {
+    createGameAssets()
+    hideMenu()
+    window.requestAnimationFrame(loop)
+}
+function drawScore() {
+    c.fillStyle = 'black';
+    c.font = '32px Arial';
+    c.textAlign = 'center';
+    c.fillText(`Total Score:  ${scoreTotal}`, scorePositionX, scorePositionY);
+    c.fillText(`This Life:  ${scoreThisLife}`, scorePositionX, scorePositionY+32);
+}
+function drawPlayerLives() {
+    for (let i = 0; i < playerLives; i++) {
+        const x = 10 + i * 40;
+        const y = 20;
+        c.fillStyle = 'firebrick';
+        c.fillRect(x, y, 32, 32);
+    }
+}
+function isPlayerOnAPlatform() {
+    platforms.forEach(platform => {
         if (
             player.position.y + player.height >= platform.position.y &&
             player.position.y <= platform.position.y + platform.height &&
             player.position.x + player.width >= platform.position.x &&
             player.position.x <= platform.position.x + platform.width
-        ) {
+        ) {if (
+            !soundPlayerLanding.paused) {
+            soundPlayerLanding.currentTime = 0; // Reset the sound to the beginning
+        }
+            soundPlayerLanding.play();
             player.jumping = false;
             player.position.y = platform.position.y - player.height;
             player.velocity.y = 0
+            addPoints
+        (platform);
         }
     });
-    if  ((player.position.x < innerWidth/2) && (player.position.x > playerStartingXPosition) &&
-        (player.inLevelXPosition.x <innerWidth/2) && (player.inLevelXPosition.x > innerWidth/4)) {
-            player.position.x = player.inLevelXPosition.x
-        }
-console.log('context',context.height)
-console.log('player bottom',player.position.y + player.height)
+}
+function isPlayerOnTheGround() {
     if (player.position.y +player.height >= context.height) {
         if (playerLives > 0) {
-            // Player loses a life
             playerLives--;
-            // Reset player position
             player.position.x = playerStartingXPosition;
             player.position.y = innerHeight/6;
             player.velocity.y = 0;
             player.velocity.x = 0;
+            player.jumping = false;
             player.inLevelXPosition.x = playerStartingXPosition;
-            platforms = generateInitialPlatforms();
-
-        } else if (!gameOver) {
-            // Player has no lives left, trigger game over
-            alert('You lose!');
-            gameOver = true
-            // Reset the game when the alert is dismissed
-            resetGame();
+            scoreThisLife=0
+            platforms = generatePlatforms();
+        } else if (playerLives===0){
+            gameOver()
         }
     }
-
-    // player lives markers
-    for (let i = 0; i < playerLives; i++) {
-        const x = 20 + i * 40;
-        const y = 20;
-        c.fillStyle = 'firebrick';
-        c.fillRect(x, y, 32, 32);
-    }
-    
-
-    // keyboard movement actions
-    if (keys.left.pressed) {
-        player.velocity.x = -5
-    } else if (keys.right.pressed) {
-        player.velocity.x = 5    
-    } else {
-        player.velocity.x = player.velocity.x * friction
-    }
-
-    //  moves the player an appropriate amount
-    player.position.x += player.velocity.x;
-
-    // keeps player on the map
+}
+function keepPlayerOnTheScreen() {
     if (player.inLevelXPosition.x > levelWidth) {
         player.inLevelXPosition.x = levelWidth
     }
@@ -206,47 +254,21 @@ console.log('player bottom',player.position.y + player.height)
     } else if (player.position.x > innerWidth/2) {
         player.position.x = innerWidth/2 
     }
-
-    // makes double jumping not work
-    if (player.position.y >= context.height - player.height) {
-        player.jumping = false;
-        player.position.y = context.height - player.height;
-        player.velocity.y = 0;
-        player.inLevelXPosition.x = playerStartingXPosition;
+}
+function movePlayer () {
+    if (keys.left.pressed) {
+        player.velocity.x = -5
+    } else if (keys.right.pressed) {
+        player.velocity.x = 5    
+    } else {
+        player.velocity.x = player.velocity.x * friction
     }
-    
-    // looper
-    window.requestAnimationFrame(loop); 
+    //  moves the player an appropriate amount
+    player.position.x += player.velocity.x;
 }
-
-function resetGame() {
-    // Reload the page to fully reset the game
-    window.location.reload();
+function createGameAssets() {
+    player = new Player
+    playerStartingXPosition = player.position.x
+    platforms = generatePlatforms();
+    player.create()
 }
-
-function generateInitialPlatforms() {
-    let initialPlatformData = level01Platforms.map((platformData) => {
-        let platform = new Platform();
-        platform.position.x = platformData.x;
-        platform.position.y = platformData.y;
-        platform.width = platformData.width;
-        return platform;
-    });
-    return initialPlatformData;
-}
-
-let platforms = generateInitialPlatforms();
-
-// for (i=0;i<platformAmount;i++){
-//     let newPlatform = new Platform
-//     platforms.push(newPlatform)
-// }
-
-
-
-
-const player = new Player
-let playerStartingXPosition = player.position.x
-console.log('player started at:', playerStartingXPosition)
-player.create()
-window.requestAnimationFrame(loop)
