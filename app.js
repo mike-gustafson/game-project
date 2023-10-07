@@ -4,7 +4,7 @@ const scoredPlatforms = new Set();
 const context = document.querySelector('canvas');
 const c = context.getContext("2d");
 const menu = document.getElementById('menu');
-const startButton = document.getElementById('startButton');
+const startButton = document.getElementById('start-button');
 startButton.addEventListener('click', startGame);
 context.width = innerWidth;
 context.height = innerHeight;
@@ -23,7 +23,7 @@ let player;
 // Sounds
 const soundPlayerJumping = new Audio('sounds/399095__plasterbrain__8bit-jump.wav');
 const soundGameOver = new Audio('sounds/362204__taranp__horn_fail_wahwah_3.wav')
-
+const backgroundMusic = new Audio('sounds/Kirill_Kharchenko_-_Background_Hip-Hop_Funk.mp3')
 
 // Physics Variables
 let friction = .7;
@@ -41,11 +41,11 @@ let keys = {
 class Player {
     constructor() {
         this.position = {
-            x: 100,
-            y: 300
+            x: 180,
+            y: 20
         }
         this.inLevelXPosition = {
-            x: 100
+            x: 180
         }
         this.velocity = {
             x: 0,
@@ -81,14 +81,8 @@ class Platform {
         c.fillStyle = 'white'
         c.fillRect(this.position.x, this.position.y, this.width, this.height)
     }
-    drawLabel() {
-        c.fillStyle = 'black';
-        c.font = '12px Arial';
-        c.fillText(`X: ${this.position.x}`, this.position.x, this.position.y - 5);
-    }
     update() {
         this.create()
-        this.drawLabel()
         this.position.x = Math.round(this.position.x);
 
         if (
@@ -113,9 +107,11 @@ addEventListener('keydown', ({ keyCode }) => {
                     break;
             case 32:
                 if (!player.jumping) {
-                    player.velocity.y = -20;
-                    player.jumping = true
-                    soundPlayerJumping.play();
+                    if (isPlayerOnAPlatform()) {
+                        player.velocity.y = -20;
+                        player.jumping = true
+                        soundPlayerJumping.play();
+                    }
                 }
                 break;
         }
@@ -183,6 +179,7 @@ function hideMenu() {
     isMenuDisplayed = false
 }
 function gameOver() {
+    backgroundMusic.pause()
     soundGameOver.play()
     showMenu();
 }
@@ -195,6 +192,7 @@ function startGame() {
     hideMenu()
     resetScores()
     playerLives = PlayerStartingLives
+    backgroundMusic.play()
     window.requestAnimationFrame(loop)
 }
 function drawScore() {
@@ -206,34 +204,35 @@ function drawScore() {
 }
 function drawPlayerLives() {
     for (let i = 0; i < playerLives; i++) {
-        const x = 10 + i * 40;
-        const y = 20;
+        let x = 180 - (i * 40);
+        let y = 20;
         c.fillStyle = 'firebrick';
         c.fillRect(x, y, 32, 32);
     }
 }
 function isPlayerOnAPlatform() {
-    platforms.forEach(platform => {
+    for (let platform of platforms) {
         if (
-            player.position.y + player.height >= platform.position.y &&
-            player.position.y <= platform.position.y + platform.height &&
+            player.position.y >= platform.position.y - player.height &&
+            player.position.y <= platform.position.y &&
             player.position.x + player.width >= platform.position.x &&
             player.position.x <= platform.position.x + platform.width
         ) {
             player.jumping = false;
             player.position.y = platform.position.y - player.height;
             player.velocity.y = 0
-            addPoints
-        (platform);
+            addPoints(generatePlatforms)
+            return true;
         }
-    });
+    }
+    return false;
 }
 function isPlayerOnTheGround() {
     if (player.position.y +player.height >= context.height) {
         if (playerLives > 0) {
             playerLives--;
             player.position.x = playerStartingXPosition;
-            player.position.y = innerHeight/6;
+            player.position.y = 20;
             player.velocity.y = 0;
             player.velocity.x = 0;
             player.jumping = false;

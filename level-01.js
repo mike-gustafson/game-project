@@ -3,6 +3,7 @@
 const level01Platforms = [
     {x: 0,   y: 600,width: 250},
     {x: 400, y: 550,width: 100},
+    {x: 550, y: 575,width:  50},
     {x: 700, y: 500,width: 120},
     {x: 1000,y: 600,width: 150},
     {x: 1300,y: 550,width: 100},
