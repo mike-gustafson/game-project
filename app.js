@@ -3,7 +3,7 @@ import level01Platforms from './level-01.js';
 const scoredPlatforms = new Set();
 const context = document.querySelector('canvas');
 const c = context.getContext("2d");
-const menu = document.getElementById('menu');
+const startMenu = document.getElementById('start-menu');
 const startButton = document.getElementById('start-button');
 startButton.addEventListener('click', startGame);
 context.width = innerWidth;
@@ -16,11 +16,13 @@ const scorePositionY = 50;
 let scoreTotal = 0;
 let scoreThisLife = 0;
 let levelWidth = 10000;
+let playerLanded = false;
 
 let playerStartingXPosition;
 let platforms;
 let player;
 // Sounds
+const soundPlayerLanding = new Audio('sounds/332661__reitanna__big-thud.wav');
 const soundPlayerJumping = new Audio('sounds/399095__plasterbrain__8bit-jump.wav');
 const soundGameOver = new Audio('sounds/362204__taranp__horn_fail_wahwah_3.wav')
 const backgroundMusic = new Audio('sounds/Kirill_Kharchenko_-_Background_Hip-Hop_Funk.mp3')
@@ -110,6 +112,7 @@ addEventListener('keydown', ({ keyCode }) => {
                     if (isPlayerOnAPlatform()) {
                         player.velocity.y = -20;
                         player.jumping = true
+                        playerLanded = false
                         soundPlayerJumping.play();
                     }
                 }
@@ -157,7 +160,7 @@ function generatePlatforms() {
     let initialPlatformData = level01Platforms.map((platformData) => {
         let platform = new Platform();
         platform.position.x = platformData.x;
-        platform.position.y = platformData.y;
+        platform.position.y = innerHeight/2 + platformData.y;
         platform.width = platformData.width;
         return platform;
     });
@@ -171,11 +174,11 @@ function addPoints(platform) {
     }
 }
 function showMenu() {
-    menu.style.display = 'flex';
+    startMenu.style.display = 'flex';
     isMenuDisplayed = true
 }
 function hideMenu() {
-    menu.style.display = 'none';
+    startMenu.style.display = 'none';
     isMenuDisplayed = false
 }
 function gameOver() {
@@ -219,9 +222,13 @@ function isPlayerOnAPlatform() {
             player.position.x <= platform.position.x + platform.width
         ) {
             player.jumping = false;
+            if (!playerLanded) {
+                soundPlayerLanding.play()
+                playerLanded = true;
+            }
             player.position.y = platform.position.y - player.height;
             player.velocity.y = 0
-            addPoints(generatePlatforms)
+            addPoints(platform)
             return true;
         }
     }
