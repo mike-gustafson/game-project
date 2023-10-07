@@ -1,22 +1,26 @@
 import level01Platforms from './level-01.js';
 
-
 let trianglesCurrentPosition = 0;
 let triangles = [];
 let trianglePeakMaxHeight = innerHeight/2;
 let trianglePeakMinHeight = innerHeight/1.5;
+let trianglesBackup = [];
 
 let clouds = [];
 let cloudX = 0;
 let cloudY = 200;
+let cloudsBackup = [];
 
-    
 const scoredPlatforms = new Set();
 const canvas = document.querySelector('canvas');
 const context = canvas.getContext("2d");
 const startMenu = document.getElementById('start-menu');
 const startButton = document.getElementById('start-button');
+const restartButton = document.getElementById('restart-button');
+const gameOverMenu = document.getElementById('game-over-menu');
+const finalScoreText = document.getElementById('final-score');
 startButton.addEventListener('click', startGame);
+restartButton.addEventListener('click', startGame);
 canvas.width = innerWidth;
 canvas.height = innerHeight;
 let isMenuDisplayed = true
@@ -31,6 +35,12 @@ let playerLanded = false;
 let playerStartingXPosition;
 let platforms;
 let player;
+let endOfLevel = levelWidth;
+let endPortalX = levelWidth - 48;
+let endPortalY;
+let endPortalWidth = 48;
+let endPortalHeight = 100;
+
 // Sounds
 const soundPlayerLanding = new Audio('sounds/332661__reitanna__big-thud.wav');
 const soundPlayerJumping = new Audio('sounds/399095__plasterbrain__8bit-jump.wav');
@@ -149,8 +159,8 @@ addEventListener('keyup', ({ keyCode }) => {
 
 const loop = function() {
     context.clearRect(0, 0, canvas.width, canvas.height);
-    drawClouds()
     drawTriangles();
+    drawClouds()
     player.update();
     drawScore()
     platforms.forEach(platform => {
@@ -159,6 +169,7 @@ const loop = function() {
     drawPlayerLives();
     isPlayerOnAPlatform();
     isPlayerOnTheGround();
+    isPlayerAtEndOfLevel();
     movePlayer();
     keepPlayerOnTheScreen();
     if (isMenuDisplayed) {
@@ -170,6 +181,26 @@ const loop = function() {
 // FUNCTIONS --------------------------------------------------------------------------
 function random(min,max){
     return Math.floor(Math.random() * (max-min + 1) + min)
+}
+function isPlayerAtEndOfLevel() {
+    if (player.inLevelXPosition.x >= endOfLevelX) {
+        if (
+            player.position.x + player.width >= endPortalX &&
+            player.position.x <= endPortalX + endPortalY &&
+            player.position.y + player.height >= canvas.height - endPortalY
+        ) {
+            console.log('you win');
+        }
+    }
+}
+function findLastPlatformY() {
+    let highestY = -1;
+    platforms.forEach(platform => {
+        if (platform.position.x > levelWidth) {
+            highestY = platform.position.y;
+        }
+    });
+    return highestY;
 }
 function generatePlatforms() {
     let initialPlatformData = level01Platforms.map((platformData) => {
@@ -188,18 +219,24 @@ function addPoints(platform) {
         scoredPlatforms.add(platform);
     }
 }
-function showMenu() {
+function showStartMenu() {
     startMenu.style.display = 'flex';
     isMenuDisplayed = true
 }
 function hideMenu() {
     startMenu.style.display = 'none';
+    gameOverMenu.style.display = 'none';
     isMenuDisplayed = false
 }
 function gameOver() {
     backgroundMusic.pause()
     soundGameOver.play()
-    showMenu();
+    showGameOverMenu();
+}
+function showGameOverMenu() {
+    gameOverMenu.style.display = 'flex';
+    finalScoreText.textContent = `${scoreTotal}`
+    isMenuDisplayed = true
 }
 function resetScores() {
     scoreThisLife = 0
@@ -209,8 +246,10 @@ function startGame() {
     createGameAssets()
     hideMenu()
     resetScores()
+    endPortalY = findLastPlatformY()
     playerLives = PlayerStartingLives
-    backgroundMusic.play()
+    backgroundMusic.play();
+
     window.requestAnimationFrame(loop)
 }
 function drawScore() {
@@ -314,12 +353,22 @@ function createTriangles(){
         b = c/2 + trianglesCurrentPosition;
         cXOffset = lastPosition+(b-a)/2
         triangles.push({a, b, c, cXOffset})
-        console.log(triangles)
         trianglesCurrentPosition = b
     }
+    trianglesBackup = triangles;
 }
 function drawTriangles() {
-    for (let i = 0; i < triangles.length; i++) {
+    for (let i = 0; i < triangles.length; i++) {        
+        if (
+            (player.position.x <= 100 && player.inLevelXPosition.x >= 100) ||
+            (player.inLevelXPosition.x < levelWidth && player.position.x >= innerWidth / 2)
+        ) {
+            if (player.velocity.x !== 0) {
+                triangles[i].a -= player.velocity.x/16;
+                triangles[i].b -= player.velocity.x/16;
+                triangles[i].cXOffset -= player.velocity.x/16;
+            }
+        }
         context.beginPath();
         context.moveTo(triangles[i].a, innerHeight);
         context.lineTo(triangles[i].b, innerHeight);
@@ -332,16 +381,24 @@ function drawTriangles() {
         context.fill();
     }
 } 
-
 function createClouds() {
     let cloudX = 0
     while (cloudX < levelWidth) {
         clouds.push({x: random(100,500)+cloudX,y: random(200, 400)})
         cloudX = cloudX + random(100,500)
     }
+    cloudsBackup = clouds
 }
-function drawClouds() {
+function drawClouds() {    
     for (let i = 0; i < clouds.length; i++){
+        if (
+            (player.position.x <= 100 && player.inLevelXPosition.x >= 100) ||
+            (player.inLevelXPosition.x < levelWidth && player.position.x >= innerWidth / 2)
+        ) {
+            if (player.velocity.x !== 0) {
+            clouds[i].x -= player.velocity.x/4;
+        }
+    }
         context.beginPath();
         context.arc(clouds[i].x, clouds[i].y, 60, Math.PI * 0.5, Math.PI * 1.5);
         context.arc(clouds[i].x + 70, clouds[i].y - 60, 70, Math.PI * 1, Math.PI * 1.85);

@@ -14,12 +14,17 @@
       <br><br>If you fall, you die. Click below to begin.<br>
       <button id="start-button">Start Game</button>
   </div>
+  <div  id="game-over-menu" class="game-over-menu">
+    GAME OVER<br>
+    You're final score was:<span id="final-score"></span><br>
+    Click here to play again: 
+    <button id="restart-button">Start Game</button>
+  </div>
 
   <canvas id="mainLayer"></canvas>
-    <script src="app.js" type="module"></script>
-    
-    <script type="module" src="./level-01.js"></script>
-    
+
+  <script src="app.js" type="module"></script>
+  <script type="module" src="./level-01.js"></script>
 </body>
 
 </html>
