@@ -1,23 +1,33 @@
 import level01Platforms from './level-01.js';
 
+
+let trianglesCurrentPosition = 0;
+let triangles = [];
+let trianglePeakMaxHeight = innerHeight/2;
+let trianglePeakMinHeight = innerHeight/1.5;
+
+let clouds = [];
+let cloudX = 0;
+let cloudY = 200;
+
+    
 const scoredPlatforms = new Set();
-const context = document.querySelector('canvas');
-const c = context.getContext("2d");
+const canvas = document.querySelector('canvas');
+const context = canvas.getContext("2d");
 const startMenu = document.getElementById('start-menu');
 const startButton = document.getElementById('start-button');
 startButton.addEventListener('click', startGame);
-context.width = innerWidth;
-context.height = innerHeight;
+canvas.width = innerWidth;
+canvas.height = innerHeight;
 let isMenuDisplayed = true
 let PlayerStartingLives = 3
 let playerLives = PlayerStartingLives;
-const scorePositionX = context.width / 2;
+const scorePositionX = canvas.width / 2;
 const scorePositionY = 50;
 let scoreTotal = 0;
 let scoreThisLife = 0;
 let levelWidth = 10000;
 let playerLanded = false;
-
 let playerStartingXPosition;
 let platforms;
 let player;
@@ -58,8 +68,9 @@ class Player {
         this.jumping = false;
     }
     create() {
-        c.fillStyle = 'firebrick'
-        c.fillRect(this.position.x, this.position.y, this.width, this.height);
+        context.fillStyle = 'firebrick'
+        context.fillRect(this.position.x, this.position.y, this.width, this.height);
+        context.strokeStyle = '#666666';
     }
     update() {
         this.create();
@@ -73,15 +84,15 @@ class Player {
 class Platform {
     constructor() {
         this.height = 15
-        this.width = Math.floor(Math.random() * (500 - 100) + 100)
+        this.width = random(100,500)
         this.position = {
             x: Math.floor(Math.random() * levelWidth-this.width),
             y: Math.floor((Math.random() * (innerHeight*.75)+(innerHeight/4)-30)),
         }
     }
     create() {
-        c.fillStyle = 'white'
-        c.fillRect(this.position.x, this.position.y, this.width, this.height)
+        context.fillStyle = 'white'
+        context.fillRect(this.position.x, this.position.y, this.width, this.height)
     }
     update() {
         this.create()
@@ -137,7 +148,9 @@ addEventListener('keyup', ({ keyCode }) => {
 // GAME LOOP -------------------------------------------------------------------------
 
 const loop = function() {
-    c.clearRect(0, 0, context.width, context.height);
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    drawClouds()
+    drawTriangles();
     player.update();
     drawScore()
     platforms.forEach(platform => {
@@ -155,7 +168,9 @@ const loop = function() {
 }
 
 // FUNCTIONS --------------------------------------------------------------------------
-
+function random(min,max){
+    return Math.floor(Math.random() * (max-min + 1) + min)
+}
 function generatePlatforms() {
     let initialPlatformData = level01Platforms.map((platformData) => {
         let platform = new Platform();
@@ -199,18 +214,18 @@ function startGame() {
     window.requestAnimationFrame(loop)
 }
 function drawScore() {
-    c.fillStyle = 'black';
-    c.font = '32px Arial';
-    c.textAlign = 'center';
-    c.fillText(`Total Score:  ${scoreTotal}`, scorePositionX, scorePositionY);
-    c.fillText(`This Life:  ${scoreThisLife}`, scorePositionX, scorePositionY+32);
+    context.fillStyle = 'black';
+    context.font = '32px Arial';
+    context.textAlign = 'center';
+    context.fillText(`Total Score:  ${scoreTotal}`, scorePositionX, scorePositionY);
+    context.fillText(`This Life:  ${scoreThisLife}`, scorePositionX, scorePositionY+32);
 }
 function drawPlayerLives() {
     for (let i = 0; i < playerLives; i++) {
         let x = 180 - (i * 40);
         let y = 20;
-        c.fillStyle = 'firebrick';
-        c.fillRect(x, y, 32, 32);
+        context.fillStyle = 'firebrick';
+        context.fillRect(x, y, 32, 32);
     }
 }
 function isPlayerOnAPlatform() {
@@ -235,7 +250,7 @@ function isPlayerOnAPlatform() {
     return false;
 }
 function isPlayerOnTheGround() {
-    if (player.position.y +player.height >= context.height) {
+    if (player.position.y +player.height >= canvas.height) {
         if (playerLives > 0) {
             playerLives--;
             player.position.x = playerStartingXPosition;
@@ -281,5 +296,62 @@ function createGameAssets() {
     player = new Player
     playerStartingXPosition = player.position.x
     platforms = generatePlatforms();
+    createTriangles();
+    clouds = []
+    createClouds()
     player.create()
+}
+function createTriangles(){
+    let lastPosition;
+    let a;
+    let b;
+    let c;
+    let cXOffset;
+    while (trianglesCurrentPosition < levelWidth) {
+        a = trianglesCurrentPosition;
+        lastPosition = trianglesCurrentPosition;
+        c = random(trianglePeakMinHeight, trianglePeakMaxHeight)
+        b = c/2 + trianglesCurrentPosition;
+        cXOffset = lastPosition+(b-a)/2
+        triangles.push({a, b, c, cXOffset})
+        console.log(triangles)
+        trianglesCurrentPosition = b
+    }
+}
+function drawTriangles() {
+    for (let i = 0; i < triangles.length; i++) {
+        context.beginPath();
+        context.moveTo(triangles[i].a, innerHeight);
+        context.lineTo(triangles[i].b, innerHeight);
+        context.lineTo(triangles[i].cXOffset, innerHeight - triangles[i].c);
+        context.closePath();
+        context.lineWidth = 5;
+        context.strokeStyle = '#666666';
+        context.stroke();
+        context.fillStyle = "#b1a849";
+        context.fill();
+    }
+} 
+
+function createClouds() {
+    let cloudX = 0
+    while (cloudX < levelWidth) {
+        clouds.push({x: random(100,500)+cloudX,y: random(200, 400)})
+        cloudX = cloudX + random(100,500)
+    }
+}
+function drawClouds() {
+    for (let i = 0; i < clouds.length; i++){
+        context.beginPath();
+        context.arc(clouds[i].x, clouds[i].y, 60, Math.PI * 0.5, Math.PI * 1.5);
+        context.arc(clouds[i].x + 70, clouds[i].y - 60, 70, Math.PI * 1, Math.PI * 1.85);
+        context.arc(clouds[i].x + 152, clouds[i].y - 45, 50, Math.PI * 1.37, Math.PI * 1.91);
+        context.arc(clouds[i].x + 200, clouds[i].y, 60, Math.PI * 1.5, Math.PI * 0.5);
+        context.moveTo(clouds[i].x + 200, clouds[i].y + 60);
+        context.lineTo(clouds[i].x, clouds[i].y + 60);
+        context.strokeStyle = '#797874';
+        context.stroke();
+        context.fillStyle = '#ffffff';
+        context.fill()
+    }
 }
