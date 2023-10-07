@@ -183,15 +183,15 @@ function random(min,max){
     return Math.floor(Math.random() * (max-min + 1) + min)
 }
 function isPlayerAtEndOfLevel() {
-    if (player.inLevelXPosition.x >= endOfLevelX) {
-        if (
-            player.position.x + player.width >= endPortalX &&
-            player.position.x <= endPortalX + endPortalY &&
-            player.position.y + player.height >= canvas.height - endPortalY
-        ) {
-            console.log('you win');
-        }
-    }
+    // if (player.inLevelXPosition.x >= endOfLevelX) {
+    //     if (
+    //         player.position.x + player.width >= endPortalX &&
+    //         player.position.x <= endPortalX + endPortalY &&
+    //         player.position.y + player.height >= canvas.height - endPortalY
+    //     ) {
+    //         console.log('you win');
+    //     }
+    // }
 }
 function findLastPlatformY() {
     let highestY = -1;
