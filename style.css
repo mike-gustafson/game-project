@@ -1,16 +1,8 @@
-
-
 body {
-margin: 0;
-overflow: hidden;
-background: #b1a849;
+    margin: 0;
+    overflow: hidden;
 }
-#start-button {
-    width: 528px;
-    height: 100px;
-    font-size: 100px;
-}
-#restart-button {
+.button {
     width: 528px;
     height: 100px;
     font-size: 100px;
@@ -18,7 +10,7 @@ background: #b1a849;
 canvas {
     background-color: skyblue;
 }
-#game-over-menu {
+.menu {
     position: absolute;
     width: 50%;
     height: 50%;
@@ -35,22 +27,4 @@ canvas {
     font-size: 32px;
     padding: 25px;
     text-align: center;    
-}
-#start-menu {
-    position: absolute;
-    width: 50%;
-    height: 50%;
-    top: 25%;
-    left: 25%;
-    background: rgba(0, 0, 0, 0.7);
-    color: white;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    z-index: 2;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 32px;
-    padding: 25px;
-    text-align: center;
 }
