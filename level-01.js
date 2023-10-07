@@ -1,7 +1,7 @@
 // level-01.js
 
 const level01Platforms = [
-    {x: 0,   y: 100,width: 250},
+    {x: 0,   y: 100,width: 9900},
     {x: 400, y:  50,width: 100},
     {x: 550, y:  75,width:  50},
     {x: 700, y:   0,width: 120},

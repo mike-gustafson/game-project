@@ -1,5 +1,5 @@
 import level01Platforms from './level-01.js';
-
+let levelExit
 let trianglesCurrentPosition = 0;
 let triangles = [];
 let trianglePeakMaxHeight = innerHeight/2;
@@ -11,7 +11,6 @@ let cloudX = 0;
 let cloudY = 200;
 let cloudsBackup = [];
 
-const scoredPlatforms = new Set();
 const canvas = document.querySelector('canvas');
 const context = canvas.getContext("2d");
 const startMenu = document.getElementById('start-menu');
@@ -21,8 +20,10 @@ const gameOverMenu = document.getElementById('game-over-menu');
 const finalScoreText = document.getElementById('final-score');
 startButton.addEventListener('click', startGame);
 restartButton.addEventListener('click', startGame);
+startMenu.style.display = 'flex'
 canvas.width = innerWidth;
 canvas.height = innerHeight;
+
 let isMenuDisplayed = true
 let PlayerStartingLives = 3
 let playerLives = PlayerStartingLives;
@@ -34,7 +35,9 @@ let levelWidth = 10000;
 let playerLanded = false;
 let playerStartingXPosition;
 let platforms;
+const scoredPlatforms = new Set();
 let player;
+
 let endOfLevel = levelWidth;
 let endPortalX = levelWidth - 48;
 let endPortalY;
@@ -99,6 +102,7 @@ class Platform {
             x: Math.floor(Math.random() * levelWidth-this.width),
             y: Math.floor((Math.random() * (innerHeight*.75)+(innerHeight/4)-30)),
         }
+        this.isExitPlatform = false;
     }
     create() {
         context.fillStyle = 'white'
@@ -118,6 +122,31 @@ class Platform {
         }
     }
 }   
+class LevelExit {
+    constructor(x, y, width, height) {
+        this.position = { x, y };
+        this.width = width;
+        this.height = height;
+    }
+
+    create() {
+        context.fillStyle = 'green'; // You can set the color to whatever you prefer
+        context.fillRect(this.position.x, this.position.y, this.width, this.height);
+    }
+    update() {
+        this.create()
+        this.position.x = Math.round(this.position.x);
+
+        if (
+            (player.position.x <= 100 && player.inLevelXPosition.x >= 100) ||
+            (player.inLevelXPosition.x < levelWidth && player.position.x >= innerWidth / 2)
+        ) {
+            if (player.velocity.x !== 0){
+                this.position.x -= player.velocity.x;
+            }
+        }
+    }
+}
 // INPUT EVENT LISTENERS--------------------------------------------------------------
 
 addEventListener('keydown', ({ keyCode }) => {
@@ -162,6 +191,7 @@ const loop = function() {
     drawTriangles();
     drawClouds()
     player.update();
+    levelExit.update()
     drawScore()
     platforms.forEach(platform => {
         platform.update()
@@ -171,7 +201,8 @@ const loop = function() {
     isPlayerOnTheGround();
     isPlayerAtEndOfLevel();
     movePlayer();
-    keepPlayerOnTheScreen();
+    keepPlayerOnTheScreen(); 
+    isPlayerAtEndOfLevel();
     if (isMenuDisplayed) {
         return;
     }
@@ -183,15 +214,14 @@ function random(min,max){
     return Math.floor(Math.random() * (max-min + 1) + min)
 }
 function isPlayerAtEndOfLevel() {
-    // if (player.inLevelXPosition.x >= endOfLevelX) {
-    //     if (
-    //         player.position.x + player.width >= endPortalX &&
-    //         player.position.x <= endPortalX + endPortalY &&
-    //         player.position.y + player.height >= canvas.height - endPortalY
-    //     ) {
-    //         console.log('you win');
-    //     }
-    // }
+    if (
+        player.inLevelXPosition.x >= levelExit.position.x &&
+        player.inLevelXPosition.x <= levelExit.position.x + levelExit.width &&
+        player.position.y + player.height >= levelExit.position.y
+    ) {
+        console.log('Player reached the level exit!');
+        // Perform actions when the player reaches the exit, e.g., end the level.
+    }
 }
 function findLastPlatformY() {
     let highestY = -1;
@@ -210,6 +240,11 @@ function generatePlatforms() {
         platform.width = platformData.width;
         return platform;
     });
+    const levelExitPlatform = new Platform();
+    levelExitPlatform.position.x = levelWidth - 40; // Position it at levelWidth - 40
+    levelExitPlatform.position.y = 400;
+    levelExitPlatform.width = 150;
+    initialPlatformData.push(levelExitPlatform);
     return initialPlatformData;
 }
 function addPoints(platform) {
@@ -248,6 +283,8 @@ function startGame() {
     resetScores()
     endPortalY = findLastPlatformY()
     playerLives = PlayerStartingLives
+    
+
     backgroundMusic.play();
 
     window.requestAnimationFrame(loop)
@@ -335,6 +372,7 @@ function createGameAssets() {
     player = new Player
     playerStartingXPosition = player.position.x
     platforms = generatePlatforms();
+    levelExit = new LevelExit(levelWidth - 40, 300, 40, 100);
     createTriangles();
     clouds = []
     createClouds()
