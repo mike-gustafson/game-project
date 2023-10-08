@@ -19,7 +19,6 @@ ul, h1, h3 {
     border: 1px solid lightgrey;
     border-radius: 10px;
     cursor: pointer;
-  
     transition: 0.1s;
   }
   .key .text {
