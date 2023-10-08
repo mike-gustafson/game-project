@@ -124,7 +124,8 @@ class Platform {
 }   
 class LevelExit {
     constructor(x, y, width, height) {
-        this.position = { x, y };
+        this.initialPosition = { x, y };
+        this.position = { ...this.initialPosition};
         this.width = width;
         this.height = height;
     }
@@ -145,6 +146,10 @@ class LevelExit {
                 this.position.x -= player.velocity.x;
             }
         }
+    }
+    reset() {
+        this.position = this.initialPosition;
+        this.create()
     }
 }
 // INPUT EVENT LISTENERS--------------------------------------------------------------
@@ -201,8 +206,7 @@ const loop = function() {
     isPlayerOnTheGround();
     isPlayerAtEndOfLevel();
     movePlayer();
-    keepPlayerOnTheScreen(); 
-    isPlayerAtEndOfLevel();
+    keepPlayerOnTheScreen();
     if (isMenuDisplayed) {
         return;
     }
@@ -215,13 +219,16 @@ function random(min,max){
 }
 function isPlayerAtEndOfLevel() {
     if (
-        player.inLevelXPosition.x >= levelExit.position.x &&
-        player.inLevelXPosition.x <= levelExit.position.x + levelExit.width &&
-        player.position.y + player.height >= levelExit.position.y
+        player.inLevelXPosition.x >= levelExit.initialPosition.x &&
+        player.inLevelXPosition.x <= levelExit.initialPosition.x + levelExit.width &&
+        player.position.y + player.height >= levelExit.initialPosition.y &&
+        player.position.y <= levelExit.initialPosition.y + levelExit.height
     ) {
-        console.log('Player reached the level exit!');
-        // Perform actions when the player reaches the exit, e.g., end the level.
+        levelOver()
     }
+}
+function levelOver() {
+    gameOver()
 }
 function findLastPlatformY() {
     let highestY = -1;
@@ -283,10 +290,8 @@ function startGame() {
     resetScores()
     endPortalY = findLastPlatformY()
     playerLives = PlayerStartingLives
-    
-
+    levelExit = new LevelExit(levelWidth - 40, 300, 40, 100);
     backgroundMusic.play();
-
     window.requestAnimationFrame(loop)
 }
 function drawScore() {
@@ -335,6 +340,7 @@ function isPlayerOnTheGround() {
             player.velocity.x = 0;
             player.jumping = false;
             player.inLevelXPosition.x = playerStartingXPosition;
+            levelExit.position.x = levelExit.initialPosition.x
             scoreThisLife=0
             platforms = generatePlatforms();
         } else if (playerLives===0){
