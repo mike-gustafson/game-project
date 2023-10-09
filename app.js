@@ -13,18 +13,37 @@ let cloudsBackup = [];
 
 const canvas = document.querySelector('canvas');
 const context = canvas.getContext("2d");
-const startMenu = document.getElementById('start-menu');
+canvas.width = innerWidth;
+canvas.height = innerHeight;
+
+// menu
+const menuContainer = document.getElementById('menu-container')
+const menuMain = document.getElementById('start-menu');
+const menuInstructions = document.getElementById('instructions-menu')
+const menuOptions = document.getElementById('options-menu')
+const menuLevelSelect = document.getElementById('level-select-menu')
+const menuCredits = document.getElementById('credits-menu')
+const menuTechnicalInfo = document.getElementById('technical-info-menu')
+const menuNavToInstructions = document.getElementById('nav-to-instructions');
+const menuNavToOptions = document.getElementById('nav-to-options');
+const menuNavToLevelSelect = document.getElementById('nav-to-level-select');
+const menuNavToCredits = document.getElementById('nav-to-credits');
+const menuNavToTechnicalInfo = document.getElementById('nav-to-technical-info');
+const menuNavToMain = document.getElementsByClassName('navigate-to-main-menu');
+menuNavToInstructions.addEventListener('click', menuShowInstructions)
+menuNavToOptions.addEventListener('click', menuShowOptions);
+menuNavToLevelSelect.addEventListener('click', menuShowLevelSelect)
+menuNavToCredits.addEventListener('click', menuShowCredits);
+menuNavToTechnicalInfo.addEventListener('click', menuShowTechnicalInfo)
 const startButton = document.getElementById('start-button');
 const restartButton = document.getElementById('restart-button');
 const gameOverMenu = document.getElementById('game-over-menu');
 const finalScoreText = document.getElementById('final-score');
-startButton.addEventListener('click', startGame);
-restartButton.addEventListener('click', startGame);
-startMenu.style.display = 'flex'
-canvas.width = innerWidth;
-canvas.height = innerHeight;
-
+startButton.addEventListener('click', menuStartGame);
+restartButton.addEventListener('click', menuStartGame);
 let isMenuDisplayed = true
+menuShow()
+
 let PlayerStartingLives = 3
 let playerLives = PlayerStartingLives;
 const scorePositionX = canvas.width / 2;
@@ -105,7 +124,7 @@ class Platform {
         this.isExitPlatform = false;
     }
     create() {
-        context.fillStyle = 'white'
+        context.fillStyle = '#565656'
         context.fillRect(this.position.x, this.position.y, this.width, this.height)
     }
     update() {
@@ -153,7 +172,14 @@ class LevelExit {
     }
 }
 // INPUT EVENT LISTENERS--------------------------------------------------------------
-
+onload = function() {
+    for(var i = 0; i < menuNavToMain.length; i++) {
+        let eachOne = menuNavToMain[i];
+        eachOne.onclick = function() {
+            menuShowMain()
+        }
+    }
+}
 addEventListener('keydown', ({ keyCode }) => {
         switch (keyCode) {
             case 65:
@@ -261,21 +287,11 @@ function addPoints(platform) {
         scoredPlatforms.add(platform);
     }
 }
-function showStartMenu() {
-    startMenu.style.display = 'flex';
-    isMenuDisplayed = true
-}
-function hideMenu() {
-    startMenu.style.display = 'none';
-    gameOverMenu.style.display = 'none';
-    isMenuDisplayed = false
-}
+
+
 function gameOver() {
     backgroundMusic.pause()
     soundGameOver.play()
-    showGameOverMenu();
-}
-function showGameOverMenu() {
     gameOverMenu.style.display = 'flex';
     finalScoreText.textContent = `${scoreTotal}`
     isMenuDisplayed = true
@@ -284,9 +300,9 @@ function resetScores() {
     scoreThisLife = 0
     scoreTotal = 0
 }
-function startGame() {
+function menuStartGame() {
     createGameAssets()
-    hideMenu()
+    menuHide()
     resetScores()
     endPortalY = findLastPlatformY()
     playerLives = PlayerStartingLives
@@ -455,4 +471,62 @@ function drawClouds() {
         context.fillStyle = '#ffffff';
         context.fill()
     }
+}
+
+
+
+function menuShow() {
+    menuContainer.style.display = 'flex';
+    isMenuDisplayed = true
+    menuShowMain()
+}
+function menuHide() {
+    menuContainer.style.display = 'none';
+    isMenuDisplayed = false
+}
+function menuShowMain() {
+    menuHideCredits();
+    menuHideInstructions();
+    menuHideLevelSelect();
+    menuHideOptions();
+    menuHideTechnicalInfo();
+    menuMain.style.display = 'flex';
+}
+function menuHideMain() {
+    menuMain.style.display = 'none';
+}
+function menuShowInstructions() {
+    menuHideMain()
+    menuInstructions.style.display = 'flex';
+}
+function menuHideInstructions() {
+    menuInstructions.style.display = 'none';
+}
+function menuShowOptions() {
+    menuHideMain()
+    menuOptions.style.display = 'flex';
+}
+function menuHideOptions() {
+    menuOptions.style.display = 'none';
+}
+function menuShowLevelSelect() {
+    menuHideMain()
+    menuLevelSelect.style.display = 'flex';
+}
+function menuHideLevelSelect() {
+    menuLevelSelect.style.display = 'none';
+}
+function menuShowCredits() {
+    menuHideMain()
+    menuCredits.style.display = 'flex';
+}
+function menuHideCredits() {
+    menuCredits.style.display = 'none';
+}
+function menuShowTechnicalInfo() {
+    menuHideMain()
+    menuTechnicalInfo.style.display = 'flex';
+}
+function menuHideTechnicalInfo() {
+    menuTechnicalInfo.style.display = 'none';
 }

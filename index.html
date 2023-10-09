@@ -6,25 +6,69 @@
     <link href = "style.css" rel = "stylesheet" type = "text/css">
 </head>
   <body>
-
+  <div id="menu-container" class="menu-container">
     <div id="start-menu" class="menu">
       <h1>Platformancer</h1>
+      <hr>
+      <h3 id="nav-to-instructions">INSTRUCTIONS</h3>
+      <h3 id="nav-to-options">OPTIONS</h3>
+      <h3 id="nav-to-level-select">LEVEL SELECT</h3>
+      <h3 id="nav-to-credits">CREDITS</h3>
+      <h3 id="nav-to-technical-info">TECHNICAL INFO</h3>
+      <h3 id="start-button">START GAME</h3>
+      </ul>
+    </div>
+
+    <div id="instructions-menu" class="menu">     
+      <h3 class="navigate-to-main-menu">< Main Menu</h3>
+      <h3>Instructions</h3>
+      Make it to the end of the level by jumping from platform to platform.  Points are awarded for each platform that you land on.
+      <hr>
       <h3>Controls</h3>
       <ul>
-        <li>move left <div class="key" type="button"><span class="text">A</span></div> <div class="key" type="button"><span class="text">D</span></div> move right
-        <li><div class="key space" type="button"><span class="text space">SPACE</span></div></li>
-        <li>jump</li>
+        <li><div class="key" type="button"><span class="text">A</span></div> move left 
+        <li><div class="key" type="button"><span class="text">D</span></div> move right
+        <li><div class="key space" type="button"><span class="text space">SPACE</span></div> jump
       </ul>
-      <br>If you fall, you die.<br><br>
-      Click below to begin.
-      <button id="start-button" class="button">Start Game</button>
+      <hr>
+    </div>
+    <div id="options-menu" class="menu">
+      <h3 class="navigate-to-main-menu">< Main Menu</h3>
+      <h3>Options</h3>
+      ---not implemented yet---<br>
+      sound on/off<br>
+      adjust window to optimal size
+      <hr>
+    </div>
+    <div id="level-select-menu" class="menu">
+      <h3 class="navigate-to-main-menu">< Main Menu</h3>
+      <h3>Level Select</h3>
+      ---not implemented yet---<br>
+      there is currently only one level
+    </div>
+    <div id="credits-menu" class="menu">
+      <h3 class="navigate-to-main-menu">< Main Menu</h3>
+      <h3>Credits</h3>
+      Concept/Development: <b>Mike Gustafson</b><br>
+      Background track: <a href="https://www.jamendo.com/track/2060643/background-hip-hop-funk">Kirill Kharchenko - Background Hip-Hop Funk</a><br>
+      
+
+    </div>
+    <div id="technical-info-menu" class="menu">
+      <h3 class="navigate-to-main-menu">< Main Menu</h3>
+      <h3>Technical Info</h3>
+      The game is light on graphics.  Everything you see is rendered inside the HTML canvas element via JavaScript.
+      <hr>
+      The JavaScript is pure vanilla. No libraries were used in creating it.
+    </div>
+    <div  id="game-over-menu" class="menu">
+      GAME OVER<br>
+      You're final score was:<span id="final-score"></span><br>
+      Click here to play again: 
+      <button id="restart-button" class="button">Start Game</button>
+    </div>
   </div>
-  <div  id="game-over-menu" class="menu">
-    GAME OVER<br>
-    You're final score was:<span id="final-score"></span><br>
-    Click here to play again: 
-    <button id="restart-button" class="button">Start Game</button>
-  </div>
+  
 
   <canvas id="mainLayer"></canvas>
 
