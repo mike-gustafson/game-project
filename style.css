@@ -20,8 +20,8 @@ ul, h1, h3 {
     border-radius: 10px;
     cursor: pointer;
     transition: 0.1s;
-  }
-  .key .text {
+}
+.key .text {
     position: relative;
     top: .1em;
     z-index: 100;
