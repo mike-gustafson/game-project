@@ -1,17 +1,14 @@
 # Platform Jumper
 
 ## Introduction:
+This project showcases the abilities of HTML5 canvas and JavaScript.  The JavaScaript renders all items on screen and the player jumps a box from platform to platform in classic fashion.  The goal is to get to an exit on the right side of the level.  The graphics and design were kept simple to allow more time and effort into the control setup and smoothness of gameplay.
 
 ![Alt text](image.png)
 ## Technologies Used:
 
-### HTML
-the front facing core of the program is built in HTML, specifically the Canvas element
+### HTML5
 ### JavaScript
-all of the logic and screen elements are push by JS into the canvas
 ### CSS
-very minimal CSS was used to maintain a clean looking interface
-
 
 ## Installation Instructions:
     None! The best part is that this game is hosted entirely online! You don't need to
@@ -109,6 +106,7 @@ function drawClouds() {
     - Need to implement persistent High Score board using an api.
     - Improve smoothness of jump mechanic, especially take-off.
     - Need to complete sound library
+    - No support for mobile/odd screen sizes yet
 
 ## Stretch Goals:
 
@@ -118,3 +116,5 @@ function drawClouds() {
     - secondchance (rewind) ability
     - wall sliding
     - collectables
+    - leaderboard
+    - deploy as app to mobile marketplaces
