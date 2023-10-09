@@ -292,6 +292,8 @@ function addPoints(platform) {
 function gameOver() {
     backgroundMusic.pause()
     soundGameOver.play()
+    menuShow();
+    menuHideMain()
     gameOverMenu.style.display = 'flex';
     finalScoreText.textContent = `${scoreTotal}`
     isMenuDisplayed = true
