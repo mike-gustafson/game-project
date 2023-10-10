@@ -7,6 +7,13 @@
 </head>
   <body>
   <div id="menu-container" class="menu-container">
+    <div id="welcome-menu" class="menu">
+      <h1>Platformancer</h1>
+      <hr>
+      Welcome to the game!<br>
+      Let's get started:<br>
+      <h3 class="navigate-to-main-menu menu-item">Enter the Game</h3>
+    </div>
     <div id="start-menu" class="menu">
       <h1>Platformancer</h1>
       <hr>
@@ -36,6 +43,7 @@
       <h1>Options</h1>
       ---not implemented yet---<br>
       sound on/off<br>
+      music on/off<br>
       adjust window to optimal size
       <hr>
       <h3 class="navigate-to-main-menu menu-item">Return To Main Menu</h3>
@@ -63,14 +71,14 @@
       <h3 class="navigate-to-main-menu menu-item">Return To Main Menu</h3>
     </div>
     <div  id="game-over-menu" class="menu">
-      GAME OVER<br>
+      <h1>GAME OVER</h1><br>
       You're final score was:<span id="final-score"></span><br>
-      Click here to play again: 
-      
-      <h3 id="restart-button" class="menu-item">START GAME</h3>
+      <h3 id="restart-button" class="menu-item">Play Again</h3>
       <h3 class="navigate-to-main-menu menu-item">Return To Main Menu</h3>
     </div>
+    <div id="image"><img src="image.png"></div>
   </div>
+  
   
 
   <canvas id="mainLayer"></canvas>

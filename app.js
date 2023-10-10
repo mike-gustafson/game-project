@@ -17,19 +17,21 @@ canvas.width = innerWidth;
 canvas.height = innerHeight;
 
 // menu
-const menuContainer = document.getElementById('menu-container')
+const menuContainer = document.getElementById('menu-container');
+const menuWelcome = document.getElementById('welcome-menu');
 const menuMain = document.getElementById('start-menu');
-const menuInstructions = document.getElementById('instructions-menu')
-const menuOptions = document.getElementById('options-menu')
-const menuLevelSelect = document.getElementById('level-select-menu')
-const menuCredits = document.getElementById('credits-menu')
-const menuTechnicalInfo = document.getElementById('technical-info-menu')
+const menuInstructions = document.getElementById('instructions-menu');
+const menuOptions = document.getElementById('options-menu');
+const menuLevelSelect = document.getElementById('level-select-menu');
+const menuCredits = document.getElementById('credits-menu');
+const menuTechnicalInfo = document.getElementById('technical-info-menu');
 const menuNavToInstructions = document.getElementById('nav-to-instructions');
 const menuNavToOptions = document.getElementById('nav-to-options');
 const menuNavToLevelSelect = document.getElementById('nav-to-level-select');
 const menuNavToCredits = document.getElementById('nav-to-credits');
 const menuNavToTechnicalInfo = document.getElementById('nav-to-technical-info');
 const menuNavToMain = document.getElementsByClassName('navigate-to-main-menu');
+const menuImage = document.getElementById('image')
 menuNavToInstructions.addEventListener('click', menuShowInstructions)
 menuNavToOptions.addEventListener('click', menuShowOptions);
 menuNavToLevelSelect.addEventListener('click', menuShowLevelSelect)
@@ -68,8 +70,9 @@ const soundPlayerJumping = new Audio('sounds/399095__plasterbrain__8bit-jump.wav
 const soundGameOver = new Audio('sounds/362204__taranp__horn_fail_wahwah_3.wav')
 const backgroundMusic = new Audio('sounds/Kirill_Kharchenko_-_Background_Hip-Hop_Funk.mp3')
 const musicMenu = new Audio("sounds/Funk'e'Tony_-_Funkafe.mp3")
-let isMenuDisplayed = true
-menuShow()
+let isMenuDisplayed = true;
+let displayMenuImage = true;
+menuShowWelcome()
 // Physics Variables
 let friction = .7;
 let gravity = 1.3;
@@ -484,12 +487,17 @@ function menuShow() {
     console.log('play music')
     musicMenu.play()
     menuShowMain()
+    
 }
 function menuHide() {
     menuContainer.style.display = 'none';
     isMenuDisplayed = false
     console.log('pause music')
     musicMenu.pause()
+    if (displayMenuImage) {
+        menuImage.style.display = 'none'
+        displayMenuImage = false
+    }
 }
 function menuShowMain() {
     menuHideCredits();
@@ -498,6 +506,10 @@ function menuShowMain() {
     menuHideOptions();
     menuHideTechnicalInfo();
     menuHideGameOver();
+    menuHideWelcome();
+    if (displayMenuImage) {
+        menuImage.style.display = 'flex'
+    }
     menuMain.style.display = 'flex';
 }
 function menuHideMain() {
@@ -539,5 +551,14 @@ function menuHideTechnicalInfo() {
     menuTechnicalInfo.style.display = 'none';
 }
 function menuHideGameOver() {
+    menuHideMain()
     gameOverMenu.style.display = 'none';
+}
+function menuShowWelcome() {
+    menuImage.style.display = 'none'
+    menuWelcome.style.display = 'flex';
+}
+function menuHideWelcome() {
+    menuWelcome.style.display = 'none'
+    musicMenu.play();
 }

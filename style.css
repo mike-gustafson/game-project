@@ -92,3 +92,12 @@ canvas {
     position: absolute;
     bottom: 1.5em;
 }
+img {
+    height: 99.5%;
+    position: absolute;
+    left: 100%;
+    border: 1px solid black
+}
+#final-score {
+    font-size: 64px;   
+}
