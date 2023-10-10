@@ -55,8 +55,9 @@ canvas {
 }
 .menu-container {
     position: absolute;
-    width:400px;
+    width:410px;
     height: 50%;
+    min-height: 400px;
     top: 25%;
     left: 1%;
     background: rgba(75, 74, 74, 0.515);
@@ -74,4 +75,20 @@ canvas {
     font-family: Arial, Helvetica, sans-serif;
     padding: .5em;
     text-align: left;    
+}
+
+.menu-item{
+    width: fit-content;
+    border: 3px solid transparent;
+    transition: .75s;
+    padding: 5px;
+    border-radius: 10px;
+}
+.menu-item:hover {
+    border: 3px solid transparent;
+    box-shadow: 0 0 25px 10px #48abe0;
+}
+.navigate-to-main-menu {
+    position: absolute;
+    bottom: 1.5em;
 }
