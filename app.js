@@ -1,5 +1,5 @@
 import level01Platforms from './levels/level-01.js';
-let levelExit
+let levelExit;
 let trianglesCurrentPosition = 0;
 let triangles = [];
 let trianglePeakMaxHeight = innerHeight/2;
@@ -31,12 +31,12 @@ const menuNavToLevelSelect = document.getElementById('nav-to-level-select');
 const menuNavToCredits = document.getElementById('nav-to-credits');
 const menuNavToTechnicalInfo = document.getElementById('nav-to-technical-info');
 const menuNavToMain = document.getElementsByClassName('navigate-to-main-menu');
-const menuImage = document.getElementById('image')
-menuNavToInstructions.addEventListener('click', menuShowInstructions)
+const menuImage = document.getElementById('image');
+menuNavToInstructions.addEventListener('click', menuShowInstructions);
 menuNavToOptions.addEventListener('click', menuShowOptions);
-menuNavToLevelSelect.addEventListener('click', menuShowLevelSelect)
+menuNavToLevelSelect.addEventListener('click', menuShowLevelSelect);
 menuNavToCredits.addEventListener('click', menuShowCredits);
-menuNavToTechnicalInfo.addEventListener('click', menuShowTechnicalInfo)
+menuNavToTechnicalInfo.addEventListener('click', menuShowTechnicalInfo);
 const startButton = document.getElementById('start-button');
 const restartButton = document.getElementById('restart-button');
 const gameOverMenu = document.getElementById('game-over-menu');
@@ -45,7 +45,7 @@ startButton.addEventListener('click', menuStartGame);
 restartButton.addEventListener('click', menuStartGame);
 
 
-let PlayerStartingLives = 3
+let PlayerStartingLives = 3;
 let playerLives = PlayerStartingLives;
 const scorePositionX = canvas.width / 2;
 const scorePositionY = 50;
@@ -67,12 +67,12 @@ let endPortalHeight = 100;
 // Sounds
 const soundPlayerLanding = new Audio('sounds/332661__reitanna__big-thud.wav');
 const soundPlayerJumping = new Audio('sounds/399095__plasterbrain__8bit-jump.wav');
-const soundGameOver = new Audio('sounds/362204__taranp__horn_fail_wahwah_3.wav')
-const backgroundMusic = new Audio('sounds/Kirill_Kharchenko_-_Background_Hip-Hop_Funk.mp3')
-const musicMenu = new Audio("sounds/Funk'e'Tony_-_Funkafe.mp3")
+const soundGameOver = new Audio('sounds/362204__taranp__horn_fail_wahwah_3.wav');
+const backgroundMusic = new Audio('sounds/Kirill_Kharchenko_-_Background_Hip-Hop_Funk.mp3');
+const musicMenu = new Audio("sounds/Funk'e'Tony_-_Funkafe.mp3");
 let isMenuDisplayed = true;
 let displayMenuImage = true;
-menuShowWelcome()
+menuShowWelcome();
 // Physics Variables
 let friction = .7;
 let gravity = 1.3;
@@ -224,12 +224,12 @@ addEventListener('keyup', ({ keyCode }) => {
 const loop = function() {
     context.clearRect(0, 0, canvas.width, canvas.height);
     drawTriangles();
-    drawClouds()
+    drawClouds();
     player.update();
-    levelExit.update()
-    drawScore()
+    levelExit.update();
+    drawScore();
     platforms.forEach(platform => {
-        platform.update()
+        platform.update();
     })
     drawPlayerLives();
     isPlayerOnAPlatform();
@@ -291,8 +291,6 @@ function addPoints(platform) {
         scoredPlatforms.add(platform);
     }
 }
-
-
 function gameOver() {
     backgroundMusic.pause()
     soundGameOver.play()
@@ -448,12 +446,12 @@ function drawTriangles() {
     }
 } 
 function createClouds() {
-    let cloudX = 0
+    let cloudX = 0;
     while (cloudX < levelWidth) {
-        clouds.push({x: random(100,500)+cloudX,y: random(200, 400)})
-        cloudX = cloudX + random(100,500)
+        clouds.push({x: random(100,500)+cloudX,y: random(200, 400)});
+        cloudX = cloudX + random(100,500);
     }
-    cloudsBackup = clouds
+    cloudsBackup = clouds;
 }
 function drawClouds() {    
     for (let i = 0; i < clouds.length; i++){
@@ -475,12 +473,9 @@ function drawClouds() {
         context.strokeStyle = '#797874';
         context.stroke();
         context.fillStyle = '#ffffff';
-        context.fill()
+        context.fill();
     }
 }
-
-
-
 function menuShow() {
     menuContainer.style.display = 'flex';
     isMenuDisplayed = true

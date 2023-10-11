@@ -14,8 +14,11 @@ This project showcases the abilities of HTML5 canvas and JavaScript.  The JavaSc
 - open your terminal and navigate to the folder you want  the project located in.
 - copy or type: 
         git clone https://github.com/mike-gustafson/game-project.git
-- copy or type:
-        open index.html
+- make sure VSCode is installed with the Live Server extention
+- navigate to the game-project folder
+- type:
+        code .
+- open index.html with Live Server
 
 No local installation needed.    
     Go to https://mike-gustafson.github.io/game-project/ to play the game online
