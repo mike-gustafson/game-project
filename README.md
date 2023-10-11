@@ -11,8 +11,14 @@ This project showcases the abilities of HTML5 canvas and JavaScript.  The JavaSc
 ### CSS
 
 ## Installation Instructions:
-    None! The best part is that this game is hosted entirely online! You don't need to
-    do anything to play it other than go to https://mike-gustafson.github.io/game-project/
+- open your terminal and navigate to the folder you want  the project located in.
+- copy or type: 
+        git clone https://github.com/mike-gustafson/game-project.git
+- copy or type:
+        open index.html
+
+No local installation needed.    
+    Go to https://mike-gustafson.github.io/game-project/ to play the game online
 
 ## Approach Taken:
 
