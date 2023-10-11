@@ -1,4 +1,4 @@
-import level01Platforms from './level-01.js';
+import level01Platforms from './levels/level-01.js';
 let levelExit
 let trianglesCurrentPosition = 0;
 let triangles = [];
